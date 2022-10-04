@@ -13,13 +13,49 @@ library(tidyverse)
 library(readxl)
 ```
 
+# Problem 1
 ```{r}
 nyc_df = read_csv('./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv') %>% 
   janitor::clean_names() %>% 
   select(line:station_longitude, starts_with("route"), entry, exit_only, vending, entrance_type, ada) %>% 
-  mutate(entry = ifelse(entry == "Yes", TRUE, FALSE))
+  mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>% 
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
   
 ```
 
+The date has `r nrow(nyc_df)` rows and `r ncol(nyc_df)` columns and it contains variables: `r names(nyc_df)`. The above date cleaning steps include selecting required variables, converting route 8-11 into character variables and converting entry variable from chatacter variable to logic variable. These data are not tidy yet.
+
+- Number of Distint Stations
+
+```{r}
+nyc_df %>% 
+  select(station_name, line) %>% 
+  distinct %>% 
+  nrow()
+```
+
+There are 465  distinct stations.
+
+- Number of Ada Compliant Stations
+
+```{r}
+nyc_df %>% 
+  filter(ada == 'TRUE') %>% 
+  select(station_name, line) %>% 
+  distinct %>% 
+  nrow()
+```
+
+There are 84 stations are ADA compliant
 
 
+- Number of stations without vending alowing entrance
+
+```{r}
+nyc_df %>% 
+  filter(vending == 'NO') %>% 
+  pull(entry) %>% 
+  mean()
+```
+
+There are 37.7% of the entrances/exits without vending allow entrance.

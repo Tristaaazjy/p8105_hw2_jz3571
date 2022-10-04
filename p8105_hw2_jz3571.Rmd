@@ -8,4 +8,18 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, message = FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+```{r}
+nyc_df = read_csv('./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv') %>% 
+  janitor::clean_names() %>% 
+  select(line:station_longitude, starts_with("route"), entry, exit_only, vending, entrance_type, ada) %>% 
+  mutate(entry = ifelse(entry == "Yes", TRUE, FALSE))
+  
+```
+
+
 

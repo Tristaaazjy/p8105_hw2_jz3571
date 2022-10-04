@@ -14,6 +14,7 @@ library(readxl)
 ```
 
 # Problem 1
+
 ```{r}
 nyc_df = read_csv('./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv') %>% 
   janitor::clean_names() %>% 
@@ -59,3 +60,15 @@ nyc_df %>%
 ```
 
 There are 37.7% of the entrances/exits without vending allow entrance.
+
+Make Route Number Distinct Variable
+
+```{r}
+nyc_df %>% 
+  pivot_longer(
+    route1:route11,
+    names_to = "route_number",
+    values_to = "route"
+  )
+```
+

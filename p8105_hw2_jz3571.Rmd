@@ -155,7 +155,7 @@ pols_month = read_csv('./data/pols_month.csv') %>%
 ```
 
 ```{r}
-tidy_month = pols_month %>% 
+tidy_pol = pols_month %>% 
   separate(mon, into = c('year', 'month', 'date'), sep = '-') %>% 
   mutate(month = month.name[as.numeric(month)], year= as.integer(year)) %>% 
   mutate(president = ifelse(prez_gop >= 1, "Republican", 'Democract')) %>% 
@@ -173,6 +173,7 @@ snp_df = read_csv('./data/snp.csv') %>%
 tidy_snp = snp_df %>% 
   separate(date, into = c('month','date','year'), sep = '/') %>% 
   mutate(month = as.integer(month), date = as.integer(date), year = as.integer(year)) %>% 
+  mutate(month = month.name[as.numeric(month)]) %>% 
   mutate(year = ifelse(year <= 15, year+2000, year+1900)) %>% 
   arrange(year, month) %>% 
   select(year, month, close)
@@ -206,5 +207,11 @@ tidy_unemp = unemp_df %>%
          year = as.integer(year))
 ```
 
+- Combine Three Dadaset
 
+```{r}
+merge_df = merge(tidy_pol, tidy_snp) %>% 
+  merge(tidy_unemp)
+```
 
+The combined data set includes `r nrow(merge_df)` rows and `r ncol(merge_df)` columns. The year range be included in the data is `r max(merge_df$year)-min(merge_df$year)` years. Some other key variables include: year, month, the number of republican and democratic governors, senators, and representatives respectively on the associated date, the party of the president on the associated date, the closing value and the unemployment rate on the associated date.

@@ -61,7 +61,7 @@ nyc_df %>%
 
 There are 37.7% of the entrances/exits without vending allow entrance.
 
-Make Route Number Distinct Variable
+- Make Route Number Distinct Variable
 
 ```{r}
 nyc_df %>% 
@@ -69,6 +69,79 @@ nyc_df %>%
     route1:route11,
     names_to = "route_number",
     values_to = "route"
-  )
+  ) %>% 
+  filter(route == "A") %>% 
+  distinct(station_name, line) %>% 
+  nrow()
+
+nyc_df %>% 
+  pivot_longer(
+    route1:route11,
+    names_to = "route_number",
+    values_to = "route"
+  ) %>% 
+  filter(route == "A", ada == "TRUE") %>% 
+  distinct(station_name, line) %>% 
+  nrow()
+```
+
+There are 60 distinct stations serve the A train, of which 17 are ada compliant
+
+# Problem 2
+
+1) Clean MR.Trash Wheel Data
+
+```{r}
+mr_df = read_excel("./data/Trash_Wheel_Collection_Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N549") %>% 
+  janitor::clean_names()
+```
+
+```{r}
+tidy_mr_df = mr_df %>% 
+  mutate(sports_balls = as.integer(sports_balls)) %>%
+  mutate(vessel_type = "Mr.Trash Wheel") %>%
+  mutate(dumpster = as.integer(dumpster))%>%
+  drop_na(dumpster)
+```
+
+2) Clean Professor Trash Wheel Data
+
+```{r}
+pr_df = read_excel("./data/Trash_Wheel_Collection_Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") %>% 
+  janitor::clean_names()
+```
+
+```{r}
+tidy_pr_df = pr_df %>% 
+  filter(!is.na(dumpster)) %>% 
+  mutate(vessel_type = "Professor Trash Wheel") %>% 
+  mutate(year = as.character(year))
+```
+
+3) Bind Two Together
+
+```{r}
+bind_df = bind_rows(tidy_mr_df, tidy_pr_df)
+```
+
+After combining two datasets, we have `r nrow(bind_df)` rows and `r ncol(bind_df)`
+columns. `vessel_type` is an added variable to distinguish the two different wheels used. Other key variables include dumspter number, month, year, date, weighted trash in tons, amount of different trash, and homes powered by trash-generated electricity.
+
+- Total weigh of trash collected to Professor Trash Wheel
+
+```{r}
+bind_df %>% 
+  filter(vessel_type == "Professor Trash Wheel") %>% 
+  select(weight_tons) %>% 
+  sum()
+```
+
+- Total number of sports balls collected by Mr. Trash Wheel
+
+```{r}
+bind_df %>% 
+  filter(vessel_type == "Mr.Trash Wheel") %>% 
+  select(sports_balls) %>% 
+  sum()
 ```
 

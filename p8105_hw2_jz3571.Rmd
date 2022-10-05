@@ -92,22 +92,25 @@ There are 60 distinct stations serve the A train, of which 17 are ada compliant
 1) Clean MR.Trash Wheel Data
 
 ```{r}
-mr_df = read_excel("./data/Trash_Wheel_Collection_Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N549") %>% 
+mr_df = read_excel("./data/Trash_Wheel_Collection_Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N550") %>% 
   janitor::clean_names()
 ```
 
 ```{r}
 tidy_mr_df = mr_df %>% 
-  mutate(sports_balls = as.integer(sports_balls)) %>%
+  mutate(sports_balls = as.integer(round(sports_balls))) %>%
   mutate(vessel_type = "Mr.Trash Wheel") %>%
   mutate(dumpster = as.integer(dumpster))%>%
   drop_na(dumpster)
+
+tidy_mr_df
 ```
+
 
 2) Clean Professor Trash Wheel Data
 
 ```{r}
-pr_df = read_excel("./data/Trash_Wheel_Collection_Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") %>% 
+pr_df = read_excel("./data/Trash_Wheel_Collection_Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M97") %>% 
   janitor::clean_names()
 ```
 
@@ -116,6 +119,8 @@ tidy_pr_df = pr_df %>%
   filter(!is.na(dumpster)) %>% 
   mutate(vessel_type = "Professor Trash Wheel") %>% 
   mutate(year = as.character(year))
+
+tidy_pr_df
 ```
 
 3) Bind Two Together
@@ -140,7 +145,7 @@ bind_df %>%
 
 ```{r}
 bind_df %>% 
-  filter(vessel_type == "Mr.Trash Wheel") %>% 
+  filter(vessel_type == "Mr.Trash Wheel", year == "2020") %>% 
   select(sports_balls) %>% 
   sum()
 ```

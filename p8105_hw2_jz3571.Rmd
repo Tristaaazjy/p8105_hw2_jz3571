@@ -18,7 +18,7 @@ library(readxl)
 ```{r}
 nyc_df = read_csv('./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv') %>% 
   janitor::clean_names() %>% 
-  select(line:station_longitude, starts_with("route"), entry, exit_only, vending, entrance_type, ada) %>% 
+  select(line:station_longitude, starts_with("route"), entry, vending, entrance_type, ada) %>% 
   mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>% 
   mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
   
@@ -36,7 +36,7 @@ nyc_df %>%
 
 There are 465  distinct stations.
 
-- Number of Ada Compliant Stations
+- Number of Ada Compliant stations
 
 ```{r}
 nyc_df %>% 
@@ -59,7 +59,7 @@ nyc_df %>%
 
 There are 37.7% of the entrances/exits without vending allow entrance.
 
-- Make Route Number Distinct Variable
+- Make route number distinct variable
 
 ```{r}
 nyc_df %>% 
@@ -123,6 +123,7 @@ tidy_pr_df
 
 3) Bind Two Together
 
+
 ```{r}
 bind_df = bind_rows(tidy_mr_df, tidy_pr_df)
 ```
@@ -140,6 +141,7 @@ bind_df %>%
 ```
 
 - Total number of sports balls collected by Mr. Trash Wheel
+
 
 ```{r}
 bind_df %>% 
@@ -165,7 +167,7 @@ tidy_pol = pols_month %>%
   select(-prez_gop, -prez_dem, -date)
 ```
 
-2) Clean snp data
+2) Clean snp data using similiar process
 
 ```{r}
 snp_df = read_csv('./data/snp.csv') %>% 
@@ -182,7 +184,7 @@ tidy_snp = snp_df %>%
   select(year, month, close)
 ```
 
-3) Clean unemployment data
+3) Clean unemployment data so it can be merged with above two datasets
 
 ```{r}
 unemp_df = read_csv('./data/unemployment.csv') %>% 
@@ -210,11 +212,22 @@ tidy_unemp = unemp_df %>%
          year = as.integer(year))
 ```
 
-- Combine Three Dadaset
+- Combine above three datasets together
 
 ```{r}
-merge_df = left_join(tidy_pol, tidy_snp) %>% 
-  left_join(tidy_unemp)
+merge_df = full_join(tidy_pol, tidy_snp) %>% 
+  full_join(tidy_unemp)
 ```
 
-The combined data set includes `r nrow(merge_df)` rows and `r ncol(merge_df)` columns. The year range be included in the data is `r max(merge_df$year)-min(merge_df$year)` years. Some other key variables include: year, month, the number of republican and democratic governors, senators, and representatives respectively on the associated date, the party of the president on the associated date, the closing value and the unemployment rate on the associated date.
+The combined data set includes `r nrow(merge_df)` rows and `r ncol(merge_df)` columns. The year range be included in the data is `r max(merge_df$year)-min(merge_df$year)` years. Some other key variables include: 
+
+- year
+- month
+- gov_gop: the number of republican governors on the associated date
+- sen_gop: the number of republican senators on the associated date
+- rep_gop: the number of republican representatives on the associated date
+- gov_dem: the number of democratic governors on the associated date
+- sen_dem: the number of democratic senators on the associated date
+- rep_dem: the number of democratic representatives on the associated date
+- close: the closing value
+- umemplyment_rate: the uemplotment date on the associated date
